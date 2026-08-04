@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+
+# Daten / Kundendaten
+data/
+
+# Backups
+*.save
+*.save.*
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Environment secrets
+.env

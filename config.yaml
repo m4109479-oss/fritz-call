@@ -1,0 +1,12 @@
+fritzbox:
+  ip: 192.168.100.10
+  port: 1012
+
+plusfakt:
+  server: 192.168.100.250
+  share: PlusFakt
+  path: PlusFakt Enterprise/Export/Export.csv
+  refresh_hours: 2
+
+customer:
+  csv_file: /data/Export.csv

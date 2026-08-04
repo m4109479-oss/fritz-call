@@ -1,0 +1,15 @@
+services:
+  fritz-call:
+    image: fritz-call
+    container_name: fritz-call
+    restart: unless-stopped
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - ./data:/data
+
+    environment:
+      SMB_USERNAME: ${SMB_USERNAME}
+      SMB_PASSWORD: ${SMB_PASSWORD}
