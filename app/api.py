@@ -18,8 +18,9 @@ def status():
 
     return {
         "online": True,
-        "current": current
+        "calls": list(current.values())
     }
+
 
 
 @app.get("/history")
@@ -31,6 +32,7 @@ def history():
         "count": len(calls),
         "calls": calls
     }
+
 
 
 @app.websocket("/ws")
@@ -53,6 +55,7 @@ async def websocket_endpoint(
         WEBSOCKET_MANAGER.disconnect(
             websocket
         )
+
 
 
 app.mount(

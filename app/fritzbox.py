@@ -14,21 +14,27 @@ class FritzBoxListener:
         self.host = host
         self.port = port
 
-        self.active_call = None
+        # mehrere gleichzeitige Gespräche möglich
+        # Schlüssel ist die FRITZ!Box Call-ID
+        self.active_calls = {}
 
 
     def parse_event(self, line):
 
         parts = line.strip().split(";")
 
-        if len(parts) < 2:
+        if len(parts) < 3:
             return None
 
+
         event = parts[1]
+        call_id = parts[2]
+
 
         result = {
             "time": parts[0],
-            "event": event
+            "event": event,
+            "id": call_id
         }
 
 
@@ -40,7 +46,9 @@ class FritzBoxListener:
 
         elif event == "CONNECT":
 
-            result["id"] = parts[3]
+            # CONNECT enthält die Nebenstelle
+            if len(parts) > 3:
+                result["target"] = parts[3]
 
 
         elif event == "DISCONNECT":
@@ -54,62 +62,80 @@ class FritzBoxListener:
 
     def handle_event(self, event):
 
-        if event["event"] == "RING":
+        event_type = event["event"]
+        call_id = event.get("id")
+
+
+        if event_type == "RING":
 
             event["customer"] = self.customer_lookup.find(
                 event["number"]
             )
 
-            self.active_call = event
+
+            # neuen aktiven Anruf speichern
+            self.active_calls[call_id] = event
 
 
-            # RING speichern und live senden
+            # sofort live senden
             self.call_manager.add_call(
                 event
             )
 
 
-        elif event["event"] == "CONNECT":
 
-            if self.active_call:
+        elif event_type == "CONNECT":
 
-                connect_call = self.active_call.copy()
+            if call_id in self.active_calls:
+
+
+                connect_call = self.active_calls[call_id].copy()
 
                 connect_call["event"] = "CONNECT"
-                connect_call["id"] = event.get("id")
+
+                connect_call["id"] = call_id
 
 
-                # nur live senden, nicht Historie
+                if "target" in event:
+                    connect_call["target"] = event["target"]
+
+
+                # nur live senden
                 EVENT_BUS.publish(
                     connect_call
                 )
 
 
 
-        elif event["event"] == "DISCONNECT":
+        elif event_type == "DISCONNECT":
 
-            if self.active_call:
+            if call_id in self.active_calls:
 
-                self.active_call["duration"] = int(
+
+                call = self.active_calls[call_id]
+
+
+                call["event"] = "DISCONNECT"
+
+
+                call["duration"] = int(
                     event.get("duration", 0)
                 )
 
 
-                self.active_call["event"] = "DISCONNECT"
-
-
                 self.call_manager.add_call(
-                    self.active_call
+                    call
                 )
 
 
                 print(
                     "Gespeichert:",
-                    self.active_call
+                    call
                 )
 
 
-                self.active_call = None
+                # nur diesen Anruf entfernen
+                del self.active_calls[call_id]
 
 
 

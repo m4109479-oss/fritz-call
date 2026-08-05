@@ -7,12 +7,26 @@ class CallManager:
     def __init__(self):
 
         self.history = CallHistory(30)
-        self.current_call = None
+
+        # mehrere aktive Gespräche
+        self.current_calls = {}
 
 
     def add_call(self, call):
 
-        self.current_call = call
+        call_id = call.get("id")
+
+
+        # Live-Zustand verwalten
+        if call.get("event") in [
+            "RING",
+            "CONNECT"
+        ]:
+
+            if call_id:
+
+                self.current_calls[call_id] = call
+
 
 
         # immer live an Browser senden
@@ -21,10 +35,12 @@ class CallManager:
         )
 
 
+
         # nur abgeschlossene Gespräche speichern
         if call.get("event") != "DISCONNECT":
 
             return
+
 
 
         duration = int(
@@ -44,14 +60,22 @@ class CallManager:
             call["status"] = "answered"
 
 
+
         self.history.add(
             call
         )
 
 
+        # aktiven Call entfernen
+        if call_id in self.current_calls:
+
+            del self.current_calls[call_id]
+
+
+
     def get_current(self):
 
-        return self.current_call
+        return self.current_calls
 
 
     def get_history(self):

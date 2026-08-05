@@ -1,179 +1,13 @@
 <!DOCTYPE html>
 <html>
+
 <head>
+
 <meta charset="utf-8">
+
 <title>Fritz-Call</title>
-<link rel="icon" type="image/png" href="/favicon.png">
 
-<style>
-
-body {
-    font-family: Arial, sans-serif;
-    margin: 30px;
-    background: #f5f5f5;
-}
-
-
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-}
-
-
-.header h1 {
-    margin: 0;
-}
-
-
-.right {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-
-#status {
-    color: green;
-    font-weight: bold;
-    margin: 0;
-}
-
-
-button {
-    padding: 8px 12px;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-
-#history {
-    width: 100%;
-}
-
-
-.call {
-
-    background: white;
-
-    border: 1px solid #ccc;
-
-    padding: 10px 15px;
-
-    margin-bottom: 8px;
-
-    border-radius: 8px;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 18px;
-
-    flex-wrap: wrap;
-
-}
-
-
-.time {
-    min-width: 140px;
-    color: #555;
-}
-
-
-.customer {
-
-    font-size: 20px;
-
-    font-weight: bold;
-
-    min-width: 220px;
-
-}
-
-
-.number {
-
-    font-size: 17px;
-
-}
-
-
-.target {
-
-    font-size: 17px;
-
-    color: #555;
-
-}
-
-
-.duration {
-
-    font-size: 17px;
-
-}
-
-
-.answered {
-
-    color: green;
-
-    font-weight: bold;
-
-}
-
-
-.missed {
-
-    color: red;
-
-    font-weight: bold;
-
-}
-
-
-#popup {
-
-    display: none;
-
-    position: fixed;
-
-    top: 30px;
-
-    right: 30px;
-
-    width: 380px;
-
-    background: white;
-
-    border: 5px solid orange;
-
-    border-radius: 12px;
-
-    padding: 25px;
-
-    box-shadow:
-        0 5px 25px rgba(0,0,0,0.4);
-
-    z-index: 9999;
-
-}
-
-
-.popup-title {
-
-    font-size: 22px;
-
-    font-weight: bold;
-
-    margin-bottom: 15px;
-
-}
-
-
-</style>
+<link rel="stylesheet" href="/css/style.css">
 
 </head>
 
@@ -181,428 +15,55 @@ button {
 <body>
 
 
-<div id="popup">
-
-    <div id="popupContent"></div>
-
-</div>
+<div id="popups"></div>
 
 
 
 <div class="header">
 
-    <h1>
-        ☎ Fritz-Call
-    </h1>
+
+<h1>
+☎ Fritz-Call
+</h1>
 
 
-    <div class="right">
+
+<div class="right">
 
 
-        <div id="status">
-            Verbinde...
-        </div>
+<div id="status">
+Verbinde...
+</div>
 
 
-        <button id="notifyButton">
 
-            🔔 Aktivieren
+<button id="notifyButton">
+🔔 Aktivieren
+</button>
 
-        </button>
 
-
-    </div>
+</div>
 
 
 </div>
 
 
 
+
+
 <h2>
-    Letzte Anrufe
+Letzte Anrufe
 </h2>
+
 
 
 <div id="history"></div>
 
 
 
-<script>
-
-
-const status =
-    document.getElementById("status");
-
-
-const history =
-    document.getElementById("history");
-
-
-const popup =
-    document.getElementById("popup");
-
-
-const popupContent =
-    document.getElementById("popupContent");
-
-
-const notifyButton =
-    document.getElementById("notifyButton");
-
-
-
-function checkNotificationStatus() {
-
-
-    if (
-        Notification.permission === "granted"
-    ) {
-
-
-        notifyButton.style.display =
-            "none";
-
-
-    }
-
-
-}
-
-
-notifyButton.onclick = function() {
-
-
-    Notification.requestPermission()
-
-    .then(function(permission){
-
-
-        console.log(
-            "Notification:",
-            permission
-        );
-
-
-        checkNotificationStatus();
-
-
-    });
-
-
-};
-
-
-checkNotificationStatus();
-function showCall(call) {
-
-
-    let state = "";
-
-
-    if(call.status === "answered") {
-
-
-        state =
-        "<div class='answered'>✓ Angenommen</div>";
-
-    }
-
-
-
-    if(call.status === "missed") {
-
-
-        state =
-        "<div class='missed'>✗ Verpasst</div>";
-
-    }
-
-
-
-    return `
-
-<div class="call">
-
-
-<div class="time">
-${call.time || "-"}
-</div>
-
-
-<div class="customer">
-${call.customer || "unbekannt"}
-</div>
-
-
-<div class="number">
-☎ ${call.number || "unterdrückt"}
-</div>
-
-
-<div class="target">
-Ziel: ${call.target || "-"}
-</div>
-
-
-<div class="duration">
-Dauer: ${call.duration || 0}s
-</div>
-
-
-${state}
-
-
-</div>
-
-`;
-
-}
-
-
-
-
-async function loadHistory() {
-
-
-    const response =
-        await fetch("/history");
-
-
-    const data =
-        await response.json();
-
-
-
-    history.innerHTML = "";
-
-
-
-    data.calls.forEach(call => {
-
-
-        history.innerHTML +=
-            showCall(call);
-
-
-    });
-
-
-}
-
-
-
-
-
-const ws =
-
-new WebSocket(
-
-    (location.protocol === "https:" ? "wss://" : "ws://")
-
-    + location.host
-
-    + "/ws"
-
-);
-
-
-
-
-
-ws.onopen = function() {
-
-
-    status.innerHTML =
-        "🟢 Verbunden";
-
-
-};
-
-
-
-
-
-ws.onclose = function() {
-
-
-    status.innerHTML =
-        "🔴 Getrennt";
-
-
-};
-
-
-
-
-
-
-ws.onmessage = function(event) {
-
-
-    console.log(
-        "EVENT:",
-        event.data
-    );
-
-
-
-    const call =
-        JSON.parse(event.data);
-
-
-
-
-    if(call.event === "RING") {
-
-
-        popup.style.borderColor =
-            "orange";
-
-
-
-        if(
-            Notification.permission === "granted"
-        ) {
-
-
-            new Notification(
-
-                "☎ Eingehender Anruf",
-
-                {
-
-                    body:
-
-                    (call.customer || "unbekannt")
-                    + "\n"
-                    + (call.number || "unterdrückt")
-                    + "\nZiel: "
-                    + (call.target || "-")
-
-                }
-
-            );
-
-
-        }
-
-
-
-        popup.style.display =
-            "block";
-
-
-
-        popupContent.innerHTML = `
-
-
-<div class="popup-title">
-☎ Eingehender Anruf
-</div>
-
-
-<div class="customer">
-${call.customer || "unbekannt"}
-</div>
-
-
-<div class="number">
-☎ ${call.number || "unterdrückt"}
-</div>
-
-
-<div class="target">
-Ziel: ${call.target || "-"}
-</div>
-
-
-`;
-
-    }
-
-
-
-
-
-    if(call.event === "CONNECT") {
-
-
-        popup.style.borderColor =
-            "green";
-
-
-        popup.style.display =
-            "block";
-
-
-        popupContent.innerHTML = `
-
-
-<div class="popup-title">
-🟢 Gespräch läuft
-</div>
-
-
-<div class="customer">
-${call.customer || "unbekannt"}
-</div>
-
-
-<div class="number">
-☎ ${call.number || "unterdrückt"}
-</div>
-
-
-<div class="target">
-Ziel: ${call.target || "-"}
-</div>
-
-
-<div style="margin-top:15px;font-weight:bold;color:green;">
-Verbindung hergestellt
-</div>
-
-
-`;
-
-    }
-
-    if(call.event === "DISCONNECT") {
-
-
-        setTimeout(function(){
-
-
-            popup.style.display =
-                "none";
-
-
-            popup.style.borderColor =
-                "orange";
-
-
-        },2000);
-
-
-    }
-
-
-
-    loadHistory();
-
-
-};
-
-
-
-
-
-
-loadHistory();
-
-
-</script>
+<script src="/js/app.js"></script>
 
 
 </body>
+
 </html>

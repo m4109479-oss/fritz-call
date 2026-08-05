@@ -1,0 +1,392 @@
+* {
+
+    box-sizing:border-box;
+
+}
+
+
+
+body {
+
+    font-family:
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    margin:30px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #eef2f7,
+            #f8f9fb
+        );
+
+    color:#222;
+
+}
+
+
+
+
+
+.header {
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    background:white;
+
+    padding:20px 25px;
+
+    border-radius:16px;
+
+    box-shadow:
+        0 5px 20px rgba(0,0,0,0.08);
+
+    margin-bottom:30px;
+
+}
+
+
+
+
+
+.header h1 {
+
+    margin:0;
+
+    font-size:32px;
+
+}
+
+
+
+
+
+.right {
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+}
+
+
+
+
+
+#status {
+
+    background:#e8f7ed;
+
+    color:#16803c;
+
+    padding:8px 14px;
+
+    border-radius:20px;
+
+    font-weight:bold;
+
+}
+
+
+
+
+
+button {
+
+    border:none;
+
+    background:#2563eb;
+
+    color:white;
+
+    padding:10px 16px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+}
+
+
+
+
+
+button:hover {
+
+    background:#1d4ed8;
+
+}
+
+
+
+
+
+
+
+#history {
+
+    width:100%;
+
+}
+
+
+
+
+
+.call {
+
+    background:white;
+
+    border-radius:14px;
+
+    padding:18px 22px;
+
+    margin-bottom:12px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:flex-start;
+
+    gap:25px;
+
+    flex-wrap:wrap;
+
+    box-shadow:
+
+        0 3px 12px rgba(0,0,0,0.08);
+
+}
+
+
+
+
+
+.time {
+
+    min-width:160px;
+
+    font-weight:600;
+
+    color:#555;
+
+}
+
+
+
+
+
+.customer {
+
+    font-size:21px;
+
+    font-weight:700;
+
+    min-width:240px;
+
+}
+
+
+
+
+
+.number {
+
+    font-size:17px;
+
+}
+
+
+
+
+
+.target {
+
+    color:#666;
+
+}
+
+
+
+
+
+.duration {
+
+    font-weight:bold;
+
+}
+
+
+
+
+
+.answered {
+
+    color:#16a34a;
+
+    font-weight:bold;
+
+}
+
+
+
+
+
+.missed {
+
+    color:#dc2626;
+
+    font-weight:bold;
+
+}
+
+
+
+
+
+
+
+/* Popup Container */
+
+#popups {
+
+    position:fixed;
+
+    top:30px;
+
+    right:30px;
+
+    width:420px;
+
+    z-index:9999;
+
+}
+
+
+
+
+
+
+#popup {
+
+
+    background:white;
+
+    border-radius:18px;
+
+    padding:25px;
+
+    border-left:
+
+        8px solid #f59e0b;
+
+
+    box-shadow:
+
+        0 10px 30px rgba(0,0,0,0.25);
+
+
+    animation:
+
+        slideIn .25s ease-out;
+
+}
+
+
+
+
+
+
+#popup.connected {
+
+
+    border-left-color:#16a34a;
+
+
+}
+
+
+
+
+
+
+.popup-title {
+
+
+    font-size:22px;
+
+    font-weight:bold;
+
+    margin-bottom:15px;
+
+
+}
+
+
+
+
+
+#popup .customer {
+
+
+    font-size:26px;
+
+}
+
+
+
+
+
+.popup-duration {
+
+
+    margin-top:20px;
+
+    background:#f3f4f6;
+
+    padding:10px;
+
+    border-radius:10px;
+
+    font-weight:bold;
+
+}
+
+
+
+
+
+
+@keyframes slideIn {
+
+
+from {
+
+    opacity:0;
+
+    transform:
+        translateX(50px);
+
+}
+
+
+to {
+
+    opacity:1;
+
+    transform:
+        translateX(0);
+
+}
+
+
+}
