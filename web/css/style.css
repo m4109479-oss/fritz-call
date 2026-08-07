@@ -1,9 +1,6 @@
 * {
-
-    box-sizing:border-box;
-
+    box-sizing: border-box;
 }
-
 
 
 body {
@@ -17,18 +14,23 @@ body {
 
     background:
         linear-gradient(
-            135deg,
-            #eef2f7,
-            #f8f9fb
-        );
+            rgba(245,247,250,0.78),
+            rgba(245,247,250,0.78)
+        ),
+        url("/background.jpg")
+        center center / cover
+        fixed
+        no-repeat;
 
     color:#222;
+
+    min-height:100vh;
 
 }
 
 
 
-
+/* Kopfbereich */
 
 .header {
 
@@ -38,20 +40,19 @@ body {
 
     align-items:center;
 
-    background:white;
+    background:
+        rgba(255,255,255,0.92);
 
-    padding:20px 25px;
+    padding:16px 22px;
 
     border-radius:16px;
 
     box-shadow:
-        0 5px 20px rgba(0,0,0,0.08);
+        0 5px 20px rgba(0,0,0,0.12);
 
-    margin-bottom:30px;
+    margin-bottom:25px;
 
 }
-
-
 
 
 
@@ -59,7 +60,7 @@ body {
 
     margin:0;
 
-    font-size:32px;
+    font-size:28px;
 
 }
 
@@ -73,7 +74,7 @@ body {
 
     align-items:center;
 
-    gap:15px;
+    gap:12px;
 
 }
 
@@ -87,13 +88,16 @@ body {
 
     color:#16803c;
 
-    padding:8px 14px;
+    padding:7px 12px;
 
     border-radius:20px;
+
+    font-size:14px;
 
     font-weight:bold;
 
 }
+
 
 
 
@@ -107,15 +111,15 @@ button {
 
     color:white;
 
-    padding:10px 16px;
+    padding:8px 14px;
 
     border-radius:8px;
 
     cursor:pointer;
 
+    font-size:14px;
+
 }
-
-
 
 
 
@@ -130,6 +134,21 @@ button:hover {
 
 
 
+h2 {
+
+    font-size:22px;
+
+    margin-bottom:15px;
+
+}
+
+
+
+
+
+
+
+/* History */
 
 #history {
 
@@ -140,16 +159,16 @@ button:hover {
 
 
 
-
 .call {
 
-    background:white;
+    background:
+        rgba(255,255,255,0.94);
 
-    border-radius:14px;
+    border-radius:12px;
 
-    padding:18px 22px;
+    padding:14px 18px;
 
-    margin-bottom:12px;
+    margin-bottom:10px;
 
     display:flex;
 
@@ -157,13 +176,17 @@ button:hover {
 
     justify-content:flex-start;
 
-    gap:25px;
+    gap:20px;
 
     flex-wrap:wrap;
 
     box-shadow:
 
-        0 3px 12px rgba(0,0,0,0.08);
+        0 3px 12px rgba(0,0,0,0.10);
+
+    border-left:
+
+        5px solid #cbd5e1;
 
 }
 
@@ -171,9 +194,23 @@ button:hover {
 
 
 
+.call:hover {
+
+    transform:
+        translateY(-1px);
+
+}
+
+
+
+
+
+
 .time {
 
-    min-width:160px;
+    min-width:145px;
+
+    font-size:14px;
 
     font-weight:600;
 
@@ -187,11 +224,11 @@ button:hover {
 
 .customer {
 
-    font-size:21px;
+    font-size:18px;
 
     font-weight:700;
 
-    min-width:240px;
+    min-width:220px;
 
 }
 
@@ -201,7 +238,9 @@ button:hover {
 
 .number {
 
-    font-size:17px;
+    font-size:15px;
+
+    min-width:150px;
 
 }
 
@@ -211,7 +250,11 @@ button:hover {
 
 .target {
 
+    font-size:14px;
+
     color:#666;
+
+    min-width:110px;
 
 }
 
@@ -221,9 +264,12 @@ button:hover {
 
 .duration {
 
+    font-size:14px;
+
     font-weight:bold;
 
 }
+
 
 
 
@@ -234,6 +280,8 @@ button:hover {
     color:#16a34a;
 
     font-weight:bold;
+
+    font-size:14px;
 
 }
 
@@ -247,6 +295,8 @@ button:hover {
 
     font-weight:bold;
 
+    font-size:14px;
+
 }
 
 
@@ -255,7 +305,7 @@ button:hover {
 
 
 
-/* Popup Container */
+/* Popup */
 
 #popups {
 
@@ -265,7 +315,7 @@ button:hover {
 
     right:30px;
 
-    width:420px;
+    width:380px;
 
     z-index:9999;
 
@@ -276,18 +326,19 @@ button:hover {
 
 
 
+
 #popup {
 
+    background:
+        rgba(255,255,255,0.96);
 
-    background:white;
+    border-radius:16px;
 
-    border-radius:18px;
-
-    padding:25px;
+    padding:22px;
 
     border-left:
 
-        8px solid #f59e0b;
+        7px solid #f59e0b;
 
 
     box-shadow:
@@ -305,12 +356,9 @@ button:hover {
 
 
 
-
 #popup.connected {
 
-
     border-left-color:#16a34a;
-
 
 }
 
@@ -318,16 +366,13 @@ button:hover {
 
 
 
-
 .popup-title {
 
-
-    font-size:22px;
+    font-size:19px;
 
     font-weight:bold;
 
-    margin-bottom:15px;
-
+    margin-bottom:12px;
 
 }
 
@@ -337,8 +382,19 @@ button:hover {
 
 #popup .customer {
 
+    font-size:22px;
 
-    font-size:26px;
+    margin-bottom:8px;
+
+}
+
+
+
+
+
+#popup .number {
+
+    font-size:17px;
 
 }
 
@@ -348,14 +404,15 @@ button:hover {
 
 .popup-duration {
 
-
-    margin-top:20px;
+    margin-top:15px;
 
     background:#f3f4f6;
 
-    padding:10px;
+    padding:9px;
 
-    border-radius:10px;
+    border-radius:8px;
+
+    font-size:14px;
 
     font-weight:bold;
 
@@ -366,27 +423,27 @@ button:hover {
 
 
 
+
 @keyframes slideIn {
 
 
-from {
+    from {
 
-    opacity:0;
+        opacity:0;
 
-    transform:
-        translateX(50px);
+        transform:
+            translateX(40px);
 
-}
+    }
 
 
-to {
+    to {
 
-    opacity:1;
+        opacity:1;
 
-    transform:
-        translateX(0);
+        transform:
+            translateX(0);
 
-}
-
+    }
 
 }
