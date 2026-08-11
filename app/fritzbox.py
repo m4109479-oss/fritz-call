@@ -14,8 +14,7 @@ class FritzBoxListener:
         self.host = host
         self.port = port
 
-        # mehrere gleichzeitige Gespräche möglich
-        # Schlüssel ist die FRITZ!Box Call-ID
+        # Mehrere gleichzeitig aktive Anrufe
         self.active_calls = {}
 
 
@@ -23,37 +22,50 @@ class FritzBoxListener:
 
         parts = line.strip().split(";")
 
-        if len(parts) < 3:
+        if len(parts) < 2:
             return None
 
-
         event = parts[1]
-        call_id = parts[2]
-
 
         result = {
             "time": parts[0],
-            "event": event,
-            "id": call_id
+            "event": event
         }
 
 
         if event == "RING":
 
+            # FRITZ!Box:
+            # time;RING;id;number;target;...
+            if len(parts) < 5:
+                return None
+
+            result["id"] = parts[2]
             result["number"] = parts[3]
             result["target"] = parts[4]
 
 
         elif event == "CONNECT":
 
-            # CONNECT enthält die Nebenstelle
-            if len(parts) > 3:
-                result["target"] = parts[3]
+            # FRITZ!Box:
+            # time;CONNECT;id;
+            if len(parts) < 3:
+                return None
+
+            result["id"] = parts[2]
 
 
         elif event == "DISCONNECT":
 
-            result["duration"] = parts[3]
+            # FRITZ!Box:
+            # time;DISCONNECT;id;duration;
+            if len(parts) >= 4:
+
+                result["id"] = parts[2]
+                result["duration"] = parts[3]
+
+            else:
+                return None
 
 
         return result
@@ -63,66 +75,96 @@ class FritzBoxListener:
     def handle_event(self, event):
 
         event_type = event["event"]
-        call_id = event.get("id")
 
+
+        # --------------------------------------------------
+        # RING
+        # --------------------------------------------------
 
         if event_type == "RING":
+
+            call_id = event.get("id")
+
+            if call_id is None:
+                return
+
 
             event["customer"] = self.customer_lookup.find(
                 event["number"]
             )
 
 
-            # neuen aktiven Anruf speichern
+            # Anruf anhand der FRITZ!Box-ID speichern
             self.active_calls[call_id] = event
 
 
-            # sofort live senden
+            # Live an Browser senden
             self.call_manager.add_call(
                 event
             )
 
 
+        # --------------------------------------------------
+        # CONNECT
+        # --------------------------------------------------
 
         elif event_type == "CONNECT":
 
-            if call_id in self.active_calls:
+            call_id = event.get("id")
+
+            if call_id is None:
+                return
 
 
-                connect_call = self.active_calls[call_id].copy()
+            call = self.active_calls.get(
+                call_id
+            )
+
+
+            if call:
+
+                connect_call = call.copy()
 
                 connect_call["event"] = "CONNECT"
 
                 connect_call["id"] = call_id
 
 
-                if "target" in event:
-                    connect_call["target"] = event["target"]
-
-
-                # nur live senden
+                # Nur live senden
                 EVENT_BUS.publish(
                     connect_call
                 )
 
 
+        # --------------------------------------------------
+        # DISCONNECT
+        # --------------------------------------------------
 
         elif event_type == "DISCONNECT":
 
-            if call_id in self.active_calls:
+            call_id = event.get("id")
 
 
-                call = self.active_calls[call_id]
+            if call_id is None:
+                return
 
 
-                call["event"] = "DISCONNECT"
+            call = self.active_calls.pop(
+                call_id,
+                None
+            )
 
+
+            if call:
 
                 call["duration"] = int(
                     event.get("duration", 0)
                 )
 
+                call["event"] = "DISCONNECT"
 
+
+                # Abschluss speichern + live senden
                 self.call_manager.add_call(
                     call
                 )
@@ -132,11 +174,6 @@ class FritzBoxListener:
                     "Gespeichert:",
                     call
                 )
-
-
-                # nur diesen Anruf entfernen
-                del self.active_calls[call_id]
-
 
 
         print(event)
