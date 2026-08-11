@@ -1,6 +1,9 @@
 # Python
 __pycache__/
-*.pyc
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
 
 # Daten / Kundendaten
 data/
@@ -12,9 +15,15 @@ data/
 # Logs
 *.log
 
+# Environment secrets
+.env
+.env.*
+!.env.example
+
 # IDE
 .vscode/
 .idea/
 
-# Environment secrets
-.env
+# OS
+.DS_Store
+Thumbs.db
