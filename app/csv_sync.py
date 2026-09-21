@@ -45,6 +45,10 @@ class CsvSync:
             exist_ok=True
         )
 
+        remote_modified = smbclient.stat(
+            remote_file
+        ).st_mtime
+
         with smbclient.open_file(
             remote_file,
             mode="rb"
@@ -59,6 +63,17 @@ class CsvSync:
                     src,
                     dst
                 )
+
+        # Den Zeitpunkt des PlusFakt-Exports beibehalten. So kann die
+        # Oberfläche das Alter der Quelldatei statt nur den Downloadzeitpunkt
+        # anzeigen.
+        os.utime(
+            local_file,
+            (
+                remote_modified,
+                remote_modified
+            )
+        )
 
         print("Gespeichert:")
         print(local_file)

@@ -1,8 +1,6 @@
 import socket
 import time
 
-from app.eventbus import EVENT_BUS
-
 
 class FritzBoxListener:
 
@@ -93,6 +91,8 @@ class FritzBoxListener:
                 event["number"]
             )
 
+            event["started_at"] = time.time()
+
 
             # Anruf anhand der FRITZ!Box-ID speichern
             self.active_calls[call_id] = event
@@ -123,6 +123,8 @@ class FritzBoxListener:
 
             if call:
 
+                call["connected_at"] = time.time()
+
                 connect_call = call.copy()
 
                 connect_call["event"] = "CONNECT"
@@ -130,8 +132,10 @@ class FritzBoxListener:
                 connect_call["id"] = call_id
 
 
-                # Nur live senden
-                EVENT_BUS.publish(
+                # Live senden und als aktuellen Gesprächszustand speichern.
+                # Dadurch sieht auch ein später geöffneter Browser das
+                # laufende Gespräch.
+                self.call_manager.add_call(
                     connect_call
                 )
 

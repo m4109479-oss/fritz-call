@@ -25,7 +25,17 @@
     .right {
         width: 100%;
 
-        justify-content: space-between;
+        align-items: flex-start;
+
+        flex-wrap: wrap;
+
+        justify-content: flex-start;
+    }
+
+    #exportInfo {
+        width: 100%;
+
+        white-space: normal;
     }
 
     .call {

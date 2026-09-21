@@ -1,6 +1,8 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 
+from app.config import load_config
+from app.export_info import get_export_modified_at
 from app.state import CALL_MANAGER
 from app.websocket_manager import WEBSOCKET_MANAGER
 
@@ -16,9 +18,14 @@ def status():
 
     current = CALL_MANAGER.get_current()
 
+    csv_filename = load_config()["customer"]["csv_file"]
+
     return {
         "online": True,
-        "calls": current
+        "calls": current,
+        "export_modified_at": get_export_modified_at(
+            csv_filename
+        )
     }
 
 

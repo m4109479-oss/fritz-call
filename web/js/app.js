@@ -7,6 +7,9 @@ const notifyButton =
 const statusElement =
     document.getElementById("status");
 
+const exportInfoElement =
+    document.getElementById("exportInfo");
+
 const historyElement =
     document.getElementById("history");
 
@@ -141,6 +144,58 @@ function formatDuration(seconds) {
         + ":"
         + String(remaining).padStart(2, "0")
     );
+
+}
+
+
+
+function timestampToMilliseconds(value, fallback) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+        return fallback;
+    }
+
+    const timestamp = Number(value);
+
+    if (Number.isFinite(timestamp)) {
+        return timestamp * 1000;
+    }
+
+    return fallback;
+
+}
+
+
+
+function renderExportInfo(value) {
+
+    if (!exportInfoElement) {
+        return;
+    }
+
+    if (!value) {
+        exportInfoElement.textContent =
+            "Exportdatei: nicht verfügbar";
+
+        return;
+    }
+
+    const modified = new Date(value);
+
+    if (Number.isNaN(modified.getTime())) {
+        exportInfoElement.textContent =
+            "Exportdatei: Zeitpunkt unbekannt";
+
+        return;
+    }
+
+    exportInfoElement.textContent =
+        "Exportdatei vom " +
+        modified.toLocaleString("de-DE");
 
 }
 
@@ -621,7 +676,7 @@ function removePopupAfterDelay(callId) {
  */
 
 
-function handleCallEvent(call) {
+function handleCallEvent(call, showNotification = true) {
 
     if (!call) {
         return;
@@ -653,7 +708,10 @@ function handleCallEvent(call) {
 
         calls[id] = {
             ...call,
-            startedAt: Date.now()
+            startedAt: timestampToMilliseconds(
+                call.started_at,
+                Date.now()
+            )
         };
 
 
@@ -662,9 +720,13 @@ function handleCallEvent(call) {
         );
 
 
-        showBrowserNotification(
-            calls[id]
-        );
+        if (showNotification) {
+
+            showBrowserNotification(
+                calls[id]
+            );
+
+        }
 
 
         return;
@@ -687,14 +749,20 @@ function handleCallEvent(call) {
             calls[id] = {
                 ...calls[id],
                 ...call,
-                connectedAt: Date.now()
+                connectedAt: timestampToMilliseconds(
+                    call.connected_at,
+                    Date.now()
+                )
             };
 
         } else {
 
             calls[id] = {
                 ...call,
-                connectedAt: Date.now()
+                connectedAt: timestampToMilliseconds(
+                    call.connected_at,
+                    Date.now()
+                )
             };
 
         }
@@ -739,6 +807,51 @@ function handleCallEvent(call) {
 
 
         return;
+    }
+
+}
+
+
+
+async function loadStatus() {
+
+    try {
+
+        const response = await fetch(
+            "/status",
+            {
+                cache: "no-store"
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                `HTTP ${response.status}`
+            );
+        }
+
+        const data = await response.json();
+
+        renderExportInfo(
+            data.export_modified_at
+        );
+
+        (data.calls || []).forEach(
+            call => handleCallEvent(
+                call,
+                false
+            )
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Status konnte nicht geladen werden:",
+            error
+        );
+
+        renderExportInfo(null);
+
     }
 
 }
@@ -908,6 +1021,8 @@ function connectWebSocket() {
                     "#16803c";
 
             }
+
+            loadStatus();
 
         };
 
