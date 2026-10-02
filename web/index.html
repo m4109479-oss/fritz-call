@@ -1,78 +1,58 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="de">
 <head>
-
-<meta charset="utf-8">
-
-<title>Fritz-Call</title>
-
-<link rel="icon" type="image/png" href="/favicon.png">
-
-<link rel="stylesheet" href="/css/style.css">
-<link rel="stylesheet" href="/css/components.css">
-<link rel="stylesheet" href="/css/responsive.css">
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1858d6">
+  <title>Fritz-Call · Anrufübersicht</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="stylesheet" href="/css/style.css?v=20261002">
+  <link rel="stylesheet" href="/css/components.css?v=20261002">
+  <link rel="stylesheet" href="/css/responsive.css?v=20261002">
 </head>
-
-
 <body>
+  <div class="shell">
+    <header class="header">
+      <div class="brand"><span class="brand-icon" aria-hidden="true">☎</span><div><h1>Fritz-Call</h1><p>Telefonie im Überblick</p></div></div>
+      <div class="header-actions">
+        <span id="status" class="badge neutral" role="status">Webserver: verbinde …</span>
+        <span id="fritzStatus" class="badge neutral">FRITZ!Box: wird geprüft …</span>
+        <button id="notifyButton" class="button secondary" type="button">Benachrichtigungen aktivieren</button>
+      </div>
+    </header>
 
+    <main>
+      <div class="page-title"><div><p class="eyebrow">ANRUFÜBERSICHT</p><h2>Alles auf einen Blick.</h2></div><p id="exportInfo" class="export-info">Kundenexport wird geprüft …</p></div>
+      <section class="stats" aria-label="Abgeschlossene Anrufe heute">
+        <div class="stat"><span>Anrufe heute</span><strong id="todayTotal">0</strong><small>Abgeschlossene Gespräche</small></div>
+        <div class="stat"><span><i class="dot green" aria-hidden="true"></i>Angenommen</span><strong id="todayAnswered">0</strong><small>Heute erreicht</small></div>
+        <div class="stat"><span><i class="dot red" aria-hidden="true"></i>Verpasst</span><strong id="todayMissed">0</strong><small>Heute ohne Gesprächsannahme</small></div>
+      </section>
 
-<div id="popups"></div>
+      <section class="active-section" aria-labelledby="activeTitle">
+        <div class="section-heading"><h2 id="activeTitle">Aktive Gespräche</h2><span id="activeCount" class="count">0</span></div>
+        <div id="activeCalls" class="active-calls" aria-live="polite"><p class="active-empty">Aktuell keine aktiven Anrufe.</p></div>
+      </section>
 
-
-
-<div class="header">
-
-
-<h1>
-☎ Fritz-Call
-</h1>
-
-
-
-<div class="right">
-
-
-<div id="exportInfo">
-Exportdatei: wird geladen...
-</div>
-
-
-<div id="status">
-Verbinde...
-</div>
-
-
-
-<button id="notifyButton">
-🔔 Aktivieren
-</button>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-<h2>
-Letzte Anrufe
-</h2>
-
-
-
-<div id="history"></div>
-
-
-
-<script src="/js/app.js"></script>
-
-
+      <section class="history-panel" aria-labelledby="historyTitle">
+        <div class="panel-heading"><div><h2 id="historyTitle">Letzte Anrufe</h2><p id="historyCount">Anrufliste wird geladen …</p></div><button id="refreshButton" class="button secondary" type="button">Aktualisieren</button></div>
+        <div class="toolbar">
+          <div class="filter-tabs" role="group" aria-label="Anrufstatus filtern">
+            <button type="button" class="filter active" data-filter="all" aria-pressed="true">Alle</button>
+            <button type="button" class="filter" data-filter="missed" aria-pressed="false">Verpasst</button>
+            <button type="button" class="filter" data-filter="answered" aria-pressed="false">Angenommen</button>
+          </div>
+          <div class="search-controls">
+            <label class="sr-only" for="search">Nach Name oder Rufnummer suchen</label><input id="search" type="search" placeholder="Name oder Rufnummer suchen …" autocomplete="off">
+            <label class="sr-only" for="period">Zeitraum</label><select id="period"><option value="all">Alle gespeicherten</option><option value="today">Heute</option><option value="7">Letzte 7 Tage</option><option value="30">Letzte 30 Tage</option></select>
+          </div>
+        </div>
+        <p id="historyError" class="error-message" role="status" hidden></p>
+        <div class="table-wrap"><table><caption class="sr-only">Liste abgeschlossener eingehender Anrufe</caption><thead><tr><th scope="col">Zeitpunkt</th><th scope="col">Kunde</th><th scope="col">Rufnummer</th><th scope="col">Ziel</th><th scope="col">Dauer</th><th scope="col">Status</th></tr></thead><tbody id="history"></tbody></table></div>
+      </section>
+    </main>
+    <footer><span>Fritz-Call · Telefonübersicht</span><span>© Michel Stückrath 2026</span></footer>
+  </div>
+  <script src="/js/app.js?v=20261002" defer></script>
 </body>
-
 </html>

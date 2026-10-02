@@ -1,285 +1,93 @@
+import logging
 import socket
 import time
 
+from app.runtime_status import RUNTIME_STATUS
+
+logger = logging.getLogger(__name__)
+
 
 class FritzBoxListener:
-
     def __init__(self, call_manager, customer_lookup, host, port):
-
         self.call_manager = call_manager
         self.customer_lookup = customer_lookup
-
         self.host = host
         self.port = port
-
-        # Mehrere gleichzeitig aktive Anrufe
         self.active_calls = {}
 
-
     def parse_event(self, line):
-
         parts = line.strip().split(";")
-
-        if len(parts) < 2:
+        if len(parts) < 3 or not parts[2]:
             return None
-
-        event = parts[1]
-
-        result = {
-            "time": parts[0],
-            "event": event
-        }
-
-
-        if event == "RING":
-
-            # FRITZ!Box:
-            # time;RING;id;number;target;...
-            if len(parts) < 5:
-                return None
-
-            result["id"] = parts[2]
-            result["number"] = parts[3]
-            result["target"] = parts[4]
-
-
-        elif event == "CONNECT":
-
-            # FRITZ!Box:
-            # time;CONNECT;id;
-            if len(parts) < 3:
-                return None
-
-            result["id"] = parts[2]
-
-
-        elif event == "DISCONNECT":
-
-            # FRITZ!Box:
-            # time;DISCONNECT;id;duration;
+        result = {"time": parts[0], "event": parts[1], "id": parts[2]}
+        if parts[1] == "RING" and len(parts) >= 5:
+            result.update(number=parts[3], target=parts[4])
+        elif parts[1] == "CONNECT":
             if len(parts) >= 4:
-
-                result["id"] = parts[2]
-                result["duration"] = parts[3]
-
-            else:
+                result["extension"] = parts[3]
+        elif parts[1] == "DISCONNECT" and len(parts) >= 4:
+            try:
+                result["duration"] = max(0, int(parts[3]))
+            except ValueError:
                 return None
-
-
+        else:
+            return None
         return result
 
-
-
     def handle_event(self, event):
-
+        call_id = event.get("id")
+        if call_id is None:
+            return
         event_type = event["event"]
-
-
-        # --------------------------------------------------
-        # RING
-        # --------------------------------------------------
-
         if event_type == "RING":
-
-            call_id = event.get("id")
-
-            if call_id is None:
-                return
-
-
-            event["customer"] = self.customer_lookup.find(
-                event["number"]
-            )
-
-            event["started_at"] = time.time()
-
-
-            # Anruf anhand der FRITZ!Box-ID speichern
-            self.active_calls[call_id] = event
-
-
-            # Live an Browser senden
-            self.call_manager.add_call(
-                event
-            )
-
-
-        # --------------------------------------------------
-        # CONNECT
-        # --------------------------------------------------
-
+            call = dict(event)
+            call["customer"] = self.customer_lookup.find(call.get("number", ""))
+            call["started_at"] = time.time()
+            self.active_calls[call_id] = call
+            self.call_manager.add_call(call)
         elif event_type == "CONNECT":
-
-            call_id = event.get("id")
-
-            if call_id is None:
-                return
-
-
-            call = self.active_calls.get(
-                call_id
-            )
-
-
+            call = self.active_calls.get(call_id)
             if call:
-
                 call["connected_at"] = time.time()
-
-                connect_call = call.copy()
-
-                connect_call["event"] = "CONNECT"
-
-                connect_call["id"] = call_id
-
-
-                # Live senden und als aktuellen Gesprächszustand speichern.
-                # Dadurch sieht auch ein später geöffneter Browser das
-                # laufende Gespräch.
-                self.call_manager.add_call(
-                    connect_call
-                )
-
-
-        # --------------------------------------------------
-        # DISCONNECT
-        # --------------------------------------------------
-
+                call["event"] = "CONNECT"
+                if "extension" in event:
+                    call["extension"] = event["extension"]
+                self.call_manager.add_call(call)
         elif event_type == "DISCONNECT":
-
-            call_id = event.get("id")
-
-
-            if call_id is None:
-                return
-
-
-            call = self.active_calls.pop(
-                call_id,
-                None
-            )
-
-
+            call = self.active_calls.pop(call_id, None)
             if call:
-
-                call["duration"] = int(
-                    event.get("duration", 0)
-                )
-
+                call["duration"] = max(0, int(event.get("duration", 0)))
                 call["event"] = "DISCONNECT"
+                self.call_manager.add_call(call)
 
-
-                # Abschluss speichern + live senden
-                self.call_manager.add_call(
-                    call
-                )
-
-
-                print(
-                    "Gespeichert:",
-                    call
-                )
-
-
-        print(event)
-
-
+    def connection_lost(self):
+        RUNTIME_STATUS.set_fritz(False)
+        self.active_calls.clear()
+        # Lost events cannot be reconstructed; do not invent history entries.
+        self.call_manager.clear_current()
 
     def start(self):
-
         while True:
-
-            sock = None
-
             try:
-
-                print(
-                    "Verbinde mit FRITZ!Box..."
-                )
-
-
-                sock = socket.socket(
-                    socket.AF_INET,
-                    socket.SOCK_STREAM
-                )
-
-
-                sock.connect(
-                    (
-                        self.host,
-                        self.port
-                    )
-                )
-
-
-                print(
-                    "Verbunden."
-                )
-
-
-                buffer = ""
-
-
-                while True:
-
-                    data = sock.recv(
-                        1024
-                    )
-
-
-                    if not data:
-
-                        raise ConnectionError(
-                            "FRITZ!Box Verbindung geschlossen"
-                        )
-
-
-                    buffer += data.decode(
-                        "utf-8"
-                    )
-
-
-                    while "\n" in buffer:
-
-                        line, buffer = buffer.split(
-                            "\n",
-                            1
-                        )
-
-
-                        event = self.parse_event(
-                            line
-                        )
-
-
-                        if event:
-
-                            self.handle_event(
-                                event
-                            )
-
-
-            except Exception as e:
-
-                print(
-                    "FRITZ!Box Fehler:",
-                    e
-                )
-
-
+                with socket.create_connection((self.host, self.port), timeout=10) as sock:
+                    sock.settimeout(None)  # Quiet periods between calls are normal.
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                    for option, value in (("TCP_KEEPIDLE", 60), ("TCP_KEEPINTVL", 15), ("TCP_KEEPCNT", 3)):
+                        if hasattr(socket, option):
+                            sock.setsockopt(socket.IPPROTO_TCP, getattr(socket, option), value)
+                    RUNTIME_STATUS.set_fritz(True)
+                    logger.info("FRITZ!Box verbunden")
+                    with sock.makefile("r", encoding="utf-8", errors="replace") as stream:
+                        for line in stream:
+                            event = self.parse_event(line)
+                            if event:
+                                try:
+                                    self.handle_event(event)
+                                except (ValueError, KeyError, OSError):
+                                    logger.exception("Telefonereignis konnte nicht verarbeitet werden")
+                    raise ConnectionError("Callmonitor-Verbindung geschlossen")
+            except Exception as error:
+                logger.warning("FRITZ!Box-Verbindung unterbrochen: %s", error)
             finally:
-
-                if sock:
-
-                    try:
-                        sock.close()
-
-                    except:
-                        pass
-
-
-            print(
-                "Neuer Verbindungsversuch in 5 Sekunden..."
-            )
-
-
+                self.connection_lost()
             time.sleep(5)

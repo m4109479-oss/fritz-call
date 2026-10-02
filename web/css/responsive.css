@@ -1,62 +1,48 @@
-/* ==========================================================
-   MOBILE
-   ========================================================== */
-
+@media (max-width: 1050px) {
+  .shell { padding: 0 22px; }
+  .header { padding: 20px 0; align-items: flex-start; }
+  .header-actions { max-width: 65%; }
+  .toolbar { flex-direction: column; align-items: flex-start; }
+  .search-controls { width: 100%; }
+  input { flex: 1; }
+  .table-wrap { overflow-x: auto; }
+  table { min-width: 760px; }
+  th, td { padding-left: 10px; padding-right: 10px; }
+}
 @media (max-width: 700px) {
-
-    body {
-        margin: 15px;
-    }
-
-    .header {
-        padding: 16px;
-
-        flex-direction: column;
-
-        align-items: flex-start;
-
-        gap: 15px;
-    }
-
-    .header h1 {
-        font-size: 24px;
-    }
-
-    .right {
-        width: 100%;
-
-        align-items: flex-start;
-
-        flex-wrap: wrap;
-
-        justify-content: flex-start;
-    }
-
-    #exportInfo {
-        width: 100%;
-
-        white-space: normal;
-    }
-
-    .call {
-        gap: 10px;
-    }
-
-    .time {
-        min-width: 100%;
-    }
-
-    .customer {
-        min-width: 100%;
-    }
-
-    #popups {
-        top: 15px;
-
-        right: 15px;
-
-        width: calc(100vw - 30px);
-
-        max-width: none;
-    }
+  .shell { padding: 0 16px; }
+  .header { flex-direction: column; gap: 16px; }
+  .header-actions { max-width: 100%; justify-content: flex-start; }
+  .page-title { padding-top: 24px; }
+  .page-title h2 { font-size: 26px; }
+  .export-info { text-align: left; }
+  .stats { gap: 8px; }
+  .stat { padding: 14px 10px; }
+  .stat > span { font-size: 11px; gap: 4px; }
+  .stat strong { font-size: 28px; }
+  .stat small { display: none; }
+  .panel-heading { padding: 18px 16px; }
+  .toolbar { padding: 0 16px 16px; }
+  .filter-tabs { width: 100%; }
+  .filter { flex: 1; padding: 7px 9px; }
+  .search-controls { flex-direction: column; }
+  input, select { width: 100%; }
+  table, tbody { display: block; min-width: 0; }
+  thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+  tbody tr { display: grid; grid-template-columns: minmax(0,1fr) auto; padding: 16px; gap: 6px 12px; border-top: 1px solid var(--line); }
+  td, td:first-child, td:last-child { display: block; padding: 0; border: 0; }
+  td.customer { grid-column: 1; grid-row: 1; font-size: 15px; }
+  td.call-status { grid-column: 2; grid-row: 1; }
+  td.number { grid-column: 1; grid-row: 2; }
+  td.time { grid-column: 1; grid-row: 3; color: var(--muted); font-size: 12px; }
+  td.time .date { display: inline; margin-left: 6px; }
+  td.target { grid-column: 1; grid-row: 4; font-size: 12px; }
+  td.target::before { content: "Ziel: "; }
+  td.duration { grid-column: 2; grid-row: 3; text-align: right; color: var(--muted); }
+  td.duration::before { content: "Dauer "; font-size: 11px; }
+  td.empty { grid-column: 1 / -1; padding: 20px 0; }
+  footer { font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { scroll-behavior: auto !important; }
 }
