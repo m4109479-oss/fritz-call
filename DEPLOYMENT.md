@@ -1,7 +1,7 @@
 # Update auf dem Ubuntu-Server
 
-Der neue Stand liegt auf `feat/dashboard-2026`. Der Originalstand auf `main`
-bleibt unverändert. Die Serverdateien `config.yaml` und `docker-compose.yml`
+Der freigegebene Dashboard-Stand liegt auf `main`. Der bisherige Originalstand
+ist auf `original/pre-dashboard-20261002` gesichert. Die Serverdateien `config.yaml` und `docker-compose.yml`
 werden auf diesem Branch nicht verändert.
 
 ## Erstes Update
@@ -28,7 +28,8 @@ if ! docker image inspect fritz-call:original-20261002 >/dev/null 2>&1; then
 fi
 
 git fetch origin
-git switch --track origin/feat/dashboard-2026
+git switch main
+git pull --ff-only origin main
 docker compose config --quiet
 docker build -t fritz-call:dashboard-20261002 .
 docker image tag fritz-call:dashboard-20261002 fritz-call:latest
@@ -41,7 +42,7 @@ UPDATE
 
 Bei einem Fehler bricht der Block ab. Der Branchwechsel schützt vor dem
 Überschreiben konfliktbehafteter lokaler Änderungen. Kein `git reset --hard`
-verwenden. Der Block ist für den ersten Wechsel von `main` gedacht.
+verwenden. Der Block ist für den Wechsel auf den freigegebenen `main`-Stand gedacht.
 
 Danach die Telefonoberfläche mit `Strg+F5` neu laden. Prüfen:
 
@@ -62,7 +63,8 @@ set -euo pipefail
 cd /opt/containers/fritz-call
 docker image tag fritz-call:original-20261002 fritz-call:latest
 docker compose up -d --no-deps --force-recreate fritz-call
-git switch main
+git fetch origin
+git switch original/pre-dashboard-20261002
 docker compose ps fritz-call
 ROLLBACK
 ```
