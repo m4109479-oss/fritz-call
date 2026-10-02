@@ -13,14 +13,12 @@
   .shell { padding: 0 16px; }
   .header { flex-direction: column; gap: 16px; }
   .header-actions { max-width: 100%; justify-content: flex-start; }
-  .page-title { padding-top: 24px; }
-  .page-title h2 { font-size: 26px; }
+  .page-title { padding-top: 18px; }
   .export-info { text-align: left; }
   .stats { gap: 8px; }
-  .stat { padding: 14px 10px; }
+  .stat { flex-direction: column; align-items: flex-start; gap: 3px; padding: 9px 8px; }
   .stat > span { font-size: 11px; gap: 4px; }
-  .stat strong { font-size: 28px; }
-  .stat small { display: none; }
+  .stat strong { font-size: 22px; }
   .panel-heading { padding: 18px 16px; }
   .toolbar { padding: 0 16px 16px; }
   .filter-tabs { width: 100%; }

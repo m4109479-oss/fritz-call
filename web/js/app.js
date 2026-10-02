@@ -115,7 +115,7 @@ function renderStatus(data) {
     const modified = data.export_modified_at ? new Date(data.export_modified_at) : null;
     const valid = modified && !Number.isNaN(modified.getTime());
     const stale = valid && Date.now() - modified.getTime() > 48 * 3600000;
-    let text = valid ? "Kundenexport: " + modified.toLocaleString("de-DE") : "Kundenexport nicht verfügbar";
+    let text = valid ? "Kundenexport: " + modified.toLocaleDateString("de-DE", {day: "2-digit", month: "2-digit", year: "numeric"}) : "Kundenexport nicht verfügbar";
     if (data.sync?.state === "error") text += " · Abgleich fehlgeschlagen";
     else if (data.sync?.state === "syncing") text += " · Wird aktualisiert";
     else if (stale) text += " · Älter als 48 Stunden";
@@ -175,7 +175,7 @@ function showNotification(call) {
     try {
         new Notification("Eingehender Anruf", {
             body: customerName(call) + "\n" + (call.number || "Unterdrückte Rufnummer"),
-            icon: "/favicon.png",
+            icon: "/favicon.svg?v=20261002-2",
             tag: "fritz-call-" + call.id + "-" + call.started_at,
         });
     } catch (error) { console.warn("Benachrichtigung konnte nicht angezeigt werden"); }
